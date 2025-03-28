@@ -13,7 +13,6 @@ if not is_admin():
 
 # Function to list files in a directory
 
-
 def list_files():
     try:
         directory = filedialog.askdirectory(title="Select a Folder")  # Let user choose directory
@@ -30,6 +29,35 @@ def list_files():
 
     except Exception as e:
         messagebox.showerror("Error", f"Could not list files: {str(e)}")
+
+# Function to deleted files 
+
+def delete_file():
+    file_path = filedialog.askopenfilename(title="Select File to Delete")
+
+    if not file_path:
+        return  # User canceled the file selection
+
+    file_path = os.path.normpath(file_path)  # Normalize the path
+
+    confirm = messagebox.askyesno("Confirm Deletion", f"Are you sure you want to delete:\n{file_path}")
+    if not confirm:
+        return
+
+    try:
+        send2trash.send2trash(file_path)
+        messagebox.showinfo("Success", f"Moved to Recycle Bin: {file_path}")
+
+    except PermissionError:
+        try:
+            os.chmod(file_path, stat.S_IWRITE)  # Remove Read-Only
+            os.remove(file_path)  # Delete the file
+            messagebox.showinfo("Success", f"Deleted: {file_path}")
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not delete file due to permission error:\n{e}")
+
+    except Exception as e:
+        messagebox.showerror("Error", f"Could not delete file:\n{e}")
 
 # Function to list deleted files using PowerShell
 
